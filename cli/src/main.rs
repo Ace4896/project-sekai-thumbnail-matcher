@@ -1,10 +1,10 @@
-use std::{path::PathBuf, fs};
+use std::{fs, path::PathBuf};
 
 use anyhow::bail;
 use clap::Parser;
 use image::io::Reader as ImageReader;
 
-use pjsekai_thumbnail_matcher::generate_thumbnail_phash;
+use pjsekai_thumbnail_matcher::hasher::generate_thumbnail_phash;
 
 #[derive(Debug, Parser)]
 #[command(name = "Project Sekai Thumbnail Matcher")]
@@ -40,7 +40,11 @@ fn main() -> anyhow::Result<()> {
         if let Ok(img_thumbnail) = ImageReader::open(&thumbnail_path)?.decode() {
             println!("Generating pHash for {}", thumbnail_path.display());
             let phash = generate_thumbnail_phash(&img_thumbnail);
-            println!("Generated pHash for {}: {}", thumbnail_path.display(), &phash);
+            println!(
+                "Generated pHash for {}: {:#0x}",
+                thumbnail_path.display(),
+                &phash
+            );
         } else {
             eprintln!("Unable to load thumbnail {}", thumbnail_path.display());
         }
