@@ -64,6 +64,7 @@ fn main() -> anyhow::Result<()> {
         }
     }
 
+    hashes.sort_unstable_by(|a, b| a.filename.cmp(&b.filename));
     std::fs::write(output, serde_json::to_string(&hashes).unwrap())?;
 
     Ok(())
