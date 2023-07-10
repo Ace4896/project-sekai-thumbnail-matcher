@@ -8,3 +8,6 @@ publish = false
 
 [dependencies]
 pjsekai_thumbnail_matcher = { path = "../lib" }
+
+dioxus = "0.3"
+dioxus-web = "0.3"
