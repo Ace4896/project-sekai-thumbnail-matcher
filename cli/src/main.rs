@@ -3,8 +3,8 @@ use std::{fs, path::PathBuf};
 use anyhow::bail;
 use clap::Parser;
 use image::io::Reader as ImageReader;
-
 use pjsekai_thumbnail_matcher::hasher::generate_thumbnail_phash;
+use serde::Serialize;
 
 #[derive(Debug, Parser)]
 #[command(name = "Project Sekai Thumbnail Matcher")]
@@ -19,6 +19,12 @@ struct Args {
     output: Option<PathBuf>,
 }
 
+#[derive(Serialize)]
+struct ThumbnailHash {
+    filename: String,
+    phash: u64,
+}
+
 fn main() -> anyhow::Result<()> {
     let Args { dir, output } = Args::parse();
 
@@ -31,6 +37,8 @@ fn main() -> anyhow::Result<()> {
     println!("Output File: {}", output.display());
     println!();
 
+    let mut hashes = Vec::new();
+
     for entry in fs::read_dir(dir)? {
         let thumbnail_path = entry?.path();
         if !thumbnail_path.is_file() {
@@ -39,12 +47,24 @@ fn main() -> anyhow::Result<()> {
 
         if let Ok(img_thumbnail) = ImageReader::open(&thumbnail_path)?.decode() {
             print!("Generating pHash for {}...", thumbnail_path.display());
+
             let phash = generate_thumbnail_phash(&img_thumbnail);
+            hashes.push(ThumbnailHash {
+                phash,
+                filename: thumbnail_path
+                    .file_name()
+                    .unwrap()
+                    .to_string_lossy()
+                    .to_string(),
+            });
+
             println!(" {:#0x}", &phash);
         } else {
             eprintln!("Unable to load thumbnail {}", thumbnail_path.display());
         }
     }
+
+    std::fs::write(output, serde_json::to_string(&hashes).unwrap())?;
 
     Ok(())
 }

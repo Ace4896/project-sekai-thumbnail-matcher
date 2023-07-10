@@ -1544,6 +1544,8 @@ dependencies = [
  "clap",
  "image",
  "pjsekai_thumbnail_matcher",
+ "serde",
+ "serde_json",
 ]
 
 [[package]]
