@@ -38,13 +38,9 @@ fn main() -> anyhow::Result<()> {
         }
 
         if let Ok(img_thumbnail) = ImageReader::open(&thumbnail_path)?.decode() {
-            println!("Generating pHash for {}", thumbnail_path.display());
+            print!("Generating pHash for {}...", thumbnail_path.display());
             let phash = generate_thumbnail_phash(&img_thumbnail);
-            println!(
-                "Generated pHash for {}: {:#0x}",
-                thumbnail_path.display(),
-                &phash
-            );
+            println!(" {:#0x}", &phash);
         } else {
             eprintln!("Unable to load thumbnail {}", thumbnail_path.display());
         }
