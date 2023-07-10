@@ -36,7 +36,8 @@ pub fn generate_thumbnail_phash(img_thumbnail: &DynamicImage) -> u64 {
                 let mut n2_sum: f32 = 0.0;
 
                 for n2 in 0..HASH_IMAGE_SIZE {
-                    n2_sum += raw_gray[n1 * HASH_IMAGE_SIZE + n2] * (pi_over_n * (n2 as f32 + 0.5) * k2 as f32).cos();
+                    n2_sum += raw_gray[n1 * HASH_IMAGE_SIZE + n2]
+                        * (pi_over_n * (n2 as f32 + 0.5) * k2 as f32).cos();
                 }
 
                 sum += n2_sum * (pi_over_n * (n1 as f32 + 0.5) * k1 as f32).cos();
