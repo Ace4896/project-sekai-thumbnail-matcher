@@ -90,5 +90,5 @@ fn crop_thumbnail_for_hash(img_thumbnail: &DynamicImage) -> DynamicImage {
     let left = (w as f32 * 0.25).floor() as u32;
     let right = (w as f32 * 0.1).floor() as u32;
 
-    img_thumbnail.crop_imm(left, right, w - left - right, h - top - bot)
+    img_thumbnail.crop_imm(left, top, w - left - right, h - top - bot)
 }
