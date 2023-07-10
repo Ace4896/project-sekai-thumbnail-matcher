@@ -11,3 +11,4 @@ pjsekai_thumbnail_matcher = { path = "../lib" }
 
 anyhow = "1.0"
 clap = { version = "4.3", features = ["derive"] }
+image = "0.24"

@@ -1,7 +1,10 @@
-use std::path::PathBuf;
+use std::{path::PathBuf, fs};
 
 use anyhow::bail;
 use clap::Parser;
+use image::io::Reader as ImageReader;
+
+use pjsekai_thumbnail_matcher::generate_thumbnail_phash;
 
 #[derive(Debug, Parser)]
 #[command(name = "Project Sekai Thumbnail Matcher")]
@@ -26,6 +29,22 @@ fn main() -> anyhow::Result<()> {
     let output = output.unwrap_or("character_hashes.json".into());
     println!("Thumbnails Directory: {}", dir.display());
     println!("Output File: {}", output.display());
+    println!();
+
+    for entry in fs::read_dir(dir)? {
+        let thumbnail_path = entry?.path();
+        if !thumbnail_path.is_file() {
+            continue;
+        }
+
+        if let Ok(img_thumbnail) = ImageReader::open(&thumbnail_path)?.decode() {
+            println!("Generating pHash for {}", thumbnail_path.display());
+            let phash = generate_thumbnail_phash(&img_thumbnail);
+            println!("Generated pHash for {}: {}", thumbnail_path.display(), &phash);
+        } else {
+            eprintln!("Unable to load thumbnail {}", thumbnail_path.display());
+        }
+    }
 
     Ok(())
 }
