@@ -28,7 +28,7 @@ fn extract_character_box(img_character_list_gray: &GrayImage) -> Option<Bounding
         })
         .map(|max_contour| {
             // Approximate the contour to a rectangle
-            // TODO: This approximation isn't working, it's still picking up the white areas in the background
+            // TODO: This approximation isn't working, it's still picking up some of the background around the character box
             let arc_length = imageproc::geometry::arc_length(&max_contour.points, true);
             let max_contour_approx = imageproc::geometry::approximate_polygon_dp(
                 &max_contour.points,
@@ -96,6 +96,7 @@ fn extract_character_thumbnails(
 
     final_contours.retain(|rect| rect.width() as f64 > width_threshold && rect.is_square_like());
 
+    // TODO: There's a lot of casting here, probably can be improved
     // Finally, crop the thumbnail images from the original image
     let img_box = img_list
         .view(
@@ -106,7 +107,6 @@ fn extract_character_thumbnails(
         )
         .to_image();
 
-    // TODO: There's a lot of casting here, probably can be improved
     final_contours
         .iter()
         .map(|rect| {
