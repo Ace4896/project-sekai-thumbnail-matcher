@@ -44,6 +44,17 @@ impl BoundingRect {
     }
 }
 
+fn median(nums: &[u32]) -> f64 {
+    let mut sorted = nums.to_vec();
+    sorted.sort_unstable();
+
+    if sorted.len() % 2 == 0 {
+        (sorted[sorted.len() / 2] + sorted[sorted.len() / 2]) as f64 / 2.0
+    } else {
+        sorted[sorted.len() / 2] as f64
+    }
+}
+
 /// Extracts card thumbnails from a character list screenshot.
 pub fn extract_thumbnail_images(img_list: &DynamicImage) -> Vec<DynamicImage> {
     let img_list_gray = img_list.to_luma8();
@@ -76,9 +87,6 @@ fn extract_character_box(img_character_list_gray: &GrayImage) -> Option<Bounding
                 0.1 * arc_length,
                 true,
             );
-
-            dbg!(BoundingRect::from_points(&max_contour.points));
-            dbg!(BoundingRect::from_points(&max_contour_approx));
 
             BoundingRect::from_points(&max_contour_approx)
         })
@@ -131,19 +139,17 @@ fn extract_character_thumbnails(
 
     // Determine the average width of each contours
     // Only need to consider square-like contours that have above-average width
-    let average_width = final_contours.iter().map(|rect| rect.width()).sum::<u32>() as f64
-        / final_contours.len() as f64;
+    let widths = final_contours
+        .iter()
+        .map(|rect| rect.width())
+        .collect::<Vec<_>>();
 
-        dbg!(&final_contours);
-        dbg!(average_width);
+    let width_threshold = median(&widths) * 0.9;
 
     final_contours.retain(|rect| {
-        rect.width() as f64 > average_width
-            // TODO: This is incorrect, bad maths...
-            // && ((rect.width() as f64 - rect.height() as f64).abs() / rect.width() as f64) < 0.1
+        rect.width() as f64 > width_threshold
+            && ((rect.width() as f64 - rect.height() as f64).abs() / rect.width() as f64) < 0.1
     });
-
-    dbg!(&final_contours);
 
     // Finally, crop the thumbnail images from the original image
     let img_box = img_list
