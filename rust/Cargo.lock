@@ -699,10 +699,18 @@ dependencies = [
 name = "pjsekai_thumbnail_matcher"
 version = "0.1.0"
 dependencies = [
+ "image",
+ "imageproc",
+]
+
+[[package]]
+name = "pjsekai_thumbnail_matcher_cli"
+version = "0.1.0"
+dependencies = [
  "anyhow",
  "clap",
  "image",
- "imageproc",
+ "pjsekai_thumbnail_matcher",
  "serde",
  "serde_json",
 ]
