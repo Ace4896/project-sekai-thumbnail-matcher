@@ -20,6 +20,12 @@ impl BoundingRect {
         self.bottom - self.top
     }
 
+    /// Determines if this bounding rectangle has a square-like shape.
+    /// This is done by checking if the difference between height and width is within 10% of the width's value.
+    pub fn is_square_like(&self) -> bool {
+        ((self.width() as f64 - self.height() as f64).abs() / self.width() as f64) < 0.1
+    }
+
     /// Determines the bounding rectangle from a set of points, ignoring object rotation.
     pub fn from_points(points: &[Point<u32>]) -> Self {
         let (min_x, min_y, max_x, max_y) = points.iter().fold(
@@ -43,7 +49,6 @@ impl BoundingRect {
     }
 }
 
-// TODO: I'm pretty sure there's an O(n) algorithm
 /// Calculates the median for the given numbers.
 pub fn median(nums: &[u32]) -> f64 {
     let mut sorted = nums.to_vec();

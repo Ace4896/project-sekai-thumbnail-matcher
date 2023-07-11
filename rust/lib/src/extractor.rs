@@ -94,10 +94,7 @@ fn extract_character_thumbnails(
 
     let width_threshold = median(&widths) * 0.9;
 
-    final_contours.retain(|rect| {
-        rect.width() as f64 > width_threshold
-            && ((rect.width() as f64 - rect.height() as f64).abs() / rect.width() as f64) < 0.1
-    });
+    final_contours.retain(|rect| rect.width() as f64 > width_threshold && rect.is_square_like());
 
     // Finally, crop the thumbnail images from the original image
     let img_box = img_list
