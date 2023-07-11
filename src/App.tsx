@@ -2,6 +2,21 @@ import { Component, For, Signal, createSignal } from "solid-js";
 
 import CanvasHost from "./CanvasHost";
 
+import init, { generate_thumbnail_phash } from '../rust/lib/pkg/pjsekai_thumbnail_matcher.js';
+
+function readFile(file: File) {
+  const reader = new FileReader();
+
+  reader.onload = function() {
+    init().then(() => {
+      console.log("Loaded image");
+      console.log(generate_thumbnail_phash(new Uint8Array(reader.result as ArrayBuffer)))
+    })
+  };
+
+  reader.readAsArrayBuffer(file);
+}
+
 const App: Component = () => {
   const [imageSource, setImageSource]: Signal<string> = createSignal();
   const [thumbnailImages, setThumbnailImages]: Signal<ImageData[]> =
@@ -39,9 +54,7 @@ const App: Component = () => {
             id="inputImgSource"
             class="form-control"
             type="file"
-            onchange={(e) =>
-              setImageSource(URL.createObjectURL(e.target.files[0]))
-            }
+            onchange={(e) => readFile(e.target.files[0])}
           />
         </div>
       </div>

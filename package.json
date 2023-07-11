@@ -3,9 +3,12 @@
   "version": "0.1.0",
   "description": "A test app for extracting and matching Project Sekai card thumbnails.",
   "private": true,
+  "main": "src/index.tsx",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
+    "dev": "npm run build:wasm && vite",
+    "build": "npm run build:wasm-release && vite build",
+    "build:wasm": "wasm-pack build --target web ./rust/lib",
+    "build:wasm-release": "wasm-pack build --target web --release ./rust/lib",
     "serve": "vite preview"
   },
   "license": "MIT",
