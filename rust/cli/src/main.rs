@@ -22,7 +22,7 @@ struct Args {
 #[derive(Serialize)]
 struct ThumbnailHash {
     filename: String,
-    phash: u64,
+    phash: String,
 }
 
 fn main() -> anyhow::Result<()> {
@@ -50,12 +50,13 @@ fn main() -> anyhow::Result<()> {
 
             let phash = generate_thumbnail_phash(&img_thumbnail);
             hashes.push(ThumbnailHash {
-                phash,
                 filename: thumbnail_path
                     .file_name()
                     .unwrap()
                     .to_string_lossy()
                     .to_string(),
+
+                phash: phash.to_string(),
             });
 
             println!(" {:#0x}", &phash);
