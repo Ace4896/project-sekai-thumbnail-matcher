@@ -1,59 +1,7 @@
 use image::{imageops, DynamicImage, GenericImageView, GrayImage};
-use imageproc::{contours::BorderType, point::Point, rect::Rect};
+use imageproc::{contours::BorderType, rect::Rect};
 
-/// A bounding rectangle.
-#[derive(Debug)]
-struct BoundingRect {
-    left: u32,
-    top: u32,
-    right: u32,
-    bottom: u32,
-}
-
-impl BoundingRect {
-    /// Gets the width of this bounding rectangle.
-    fn width(&self) -> u32 {
-        self.right - self.left
-    }
-
-    /// Gets the height of this bounding rectangle.
-    fn height(&self) -> u32 {
-        self.bottom - self.top
-    }
-
-    /// Determines the bounding rectangle from a set of points, ignoring object rotation.
-    fn from_points(points: &[Point<u32>]) -> Self {
-        let (min_x, min_y, max_x, max_y) = points.iter().fold(
-            (u32::MAX, u32::MAX, u32::MIN, u32::MIN),
-            |(left, top, right, bot), point| {
-                (
-                    left.min(point.x),
-                    top.min(point.y),
-                    right.max(point.x),
-                    bot.max(point.y),
-                )
-            },
-        );
-
-        Self {
-            left: min_x,
-            top: min_y,
-            right: max_x,
-            bottom: max_y,
-        }
-    }
-}
-
-fn median(nums: &[u32]) -> f64 {
-    let mut sorted = nums.to_vec();
-    sorted.sort_unstable();
-
-    if sorted.len() % 2 == 0 {
-        (sorted[sorted.len() / 2] + sorted[sorted.len() / 2]) as f64 / 2.0
-    } else {
-        sorted[sorted.len() / 2] as f64
-    }
-}
+use crate::utils::{median, BoundingRect};
 
 /// Extracts card thumbnails from a character list screenshot.
 pub fn extract_thumbnail_images(img_list: &DynamicImage) -> Vec<DynamicImage> {
