@@ -1,0 +1,23 @@
+{
+  "name": "project-sekai-thumbnail-matcher",
+  "version": "0.1.0",
+  "description": "A test app for extracting and matching Project Sekai card thumbnails.",
+  "private": true,
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "serve": "vite preview"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "sass": "^1.63.6",
+    "typescript": "^5.1.6",
+    "vite": "^4.3.9",
+    "vite-plugin-solid": "^2.7.0"
+  },
+  "dependencies": {
+    "@popperjs/core": "^2.11.8",
+    "bootstrap": "^5.3.0",
+    "solid-js": "^1.7.7"
+  }
+}
