@@ -4,17 +4,27 @@ import CanvasHost from "./CanvasHost";
 
 import init, { generate_thumbnail_phash } from '../rust/lib/pkg/pjsekai_thumbnail_matcher.js';
 
-function readFile(file: File) {
-  const reader = new FileReader();
+function loadImageData(file: File): Promise<ImageData> {
+  return new Promise(resolve => {
+    const img = document.createElement("img");
 
-  reader.onload = function() {
-    init().then(() => {
-      console.log("Loaded image");
-      console.log(generate_thumbnail_phash(new Uint8Array(reader.result as ArrayBuffer)))
-    })
-  };
+    img.onload = () => {
+      const canvas = new OffscreenCanvas(img.width, img.height);
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(img, 0, 0);
 
-  reader.readAsArrayBuffer(file);
+      const imageData = ctx.getImageData(0, 0, img.width, img.height);
+
+      init().then(() => {
+        console.log(imageData);
+        console.log(generate_thumbnail_phash(imageData));
+      })
+
+      resolve(imageData);
+    }
+
+    img.src = URL.createObjectURL(file);
+  });
 }
 
 const App: Component = () => {
@@ -54,7 +64,7 @@ const App: Component = () => {
             id="inputImgSource"
             class="form-control"
             type="file"
-            onchange={(e) => readFile(e.target.files[0])}
+            onchange={(e) => loadImageData(e.target.files[0])}
           />
         </div>
       </div>
