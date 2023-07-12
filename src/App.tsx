@@ -3,8 +3,8 @@ import { Component, For, Signal, createSignal } from "solid-js";
 import CanvasHost from "./CanvasHost";
 
 import init, {
-  extract_thumbnail_images,
-  generate_thumbnail_phash,
+  extractThumbnailImages,
+  generateThumbnailPhash,
 } from "../rust/lib/pkg/pjsekai_thumbnail_matcher";
 import { convertRustImage, loadImageData } from "./utils";
 
@@ -17,7 +17,7 @@ const App: Component = () => {
 
     const imgCharacterList = await loadImageData(file);
     const imgExtractedThumbnails =
-      extract_thumbnail_images(imgCharacterList).map(convertRustImage);
+      extractThumbnailImages(imgCharacterList).map(convertRustImage);
 
     setThumbnailImages(imgExtractedThumbnails);
   };

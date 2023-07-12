@@ -51,7 +51,7 @@ fn convert_to_dynamic_image(image_data: ImageData) -> DynamicImage {
 }
 
 /// Extracts card thumbnails from a character list screenshot.
-#[wasm_bindgen]
+#[wasm_bindgen(js_name = "extractThumbnailImages")]
 pub fn extract_thumbnail_images(image_data: ImageData) -> IRgba8ImageDataArray {
     let image = convert_to_dynamic_image(image_data);
     let thumbnail_images = extractor::extract_thumbnail_images(&image)
@@ -65,7 +65,7 @@ pub fn extract_thumbnail_images(image_data: ImageData) -> IRgba8ImageDataArray {
 }
 
 /// Generate a pHash for the specified thumbnail image.
-#[wasm_bindgen]
+#[wasm_bindgen(js_name = "generateThumbnailPhash")]
 pub fn generate_thumbnail_phash(image_data: ImageData) -> u64 {
     let image = convert_to_dynamic_image(image_data);
     hasher::generate_thumbnail_phash(&image)
