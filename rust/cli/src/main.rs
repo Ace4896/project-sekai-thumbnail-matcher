@@ -1,22 +1,43 @@
-use std::{fs, path::PathBuf};
+use std::{ffi::OsString, fs, path::PathBuf};
 
 use anyhow::bail;
-use clap::Parser;
+use clap::{Parser, Subcommand};
 use image::io::Reader as ImageReader;
-use pjsekai_thumbnail_matcher::hasher::generate_thumbnail_phash;
+use pjsekai_thumbnail_matcher::{
+    extractor::extract_thumbnail_images, hasher::generate_thumbnail_phash,
+};
 use serde::Serialize;
 
-#[derive(Debug, Parser)]
+#[derive(Parser)]
 #[command(name = "Project Sekai Thumbnail Matcher")]
 #[command(version = "0.1.0")]
-#[command(about = "Generate pHashes for matching Project Sekai card thumbnails")]
+#[command(about = "Tool for matching Project Sekai card thumbnails")]
 struct Args {
-    /// The directory containing the thumbnail images
-    dir: PathBuf,
+    #[command(subcommand)]
+    command: Commands,
+}
 
-    /// The JSON file to put the pHashes into. Defaults to "character_hashes.json"
-    #[arg(short, long)]
-    output: Option<PathBuf>,
+#[derive(Subcommand)]
+enum Commands {
+    /// Generates pHashes for a folder of thumbnail images
+    Hash {
+        /// The folder containing the thumbnail images
+        folder: PathBuf,
+
+        /// The JSON file to put the pHashes into. Defaults to "$(pwd)/character_hashes.json"
+        #[arg(short, long)]
+        output: Option<PathBuf>,
+    },
+
+    /// Extracts thumbnail images from a character list screenshot
+    Extract {
+        /// The character list screenshot
+        screenshot: PathBuf,
+
+        /// The folder to put the pHashes into. Defaults to "$(pwd)/output"
+        #[arg(short, long)]
+        output: Option<PathBuf>,
+    },
 }
 
 #[derive(Serialize)]
@@ -26,21 +47,29 @@ struct ThumbnailHash {
 }
 
 fn main() -> anyhow::Result<()> {
-    let Args { dir, output } = Args::parse();
+    match Args::parse().command {
+        Commands::Hash { folder, output } => {
+            hash(folder, output.unwrap_or("./character_hashes.json".into()))
+        }
+        Commands::Extract { screenshot, output } => {
+            extract(screenshot, output.unwrap_or("./output".into()))
+        }
+    }
+}
 
-    if !dir.exists() {
-        bail!("Could not open directory: {}", dir.display());
+fn hash(folder: PathBuf, output: PathBuf) -> anyhow::Result<()> {
+    if !folder.is_dir() {
+        bail!("Could not open input folder {}", folder.display());
     }
 
-    let output = output.unwrap_or("character_hashes.json".into());
-    println!("Thumbnails Directory: {}", dir.display());
+    println!("Thumbnails Folder: {}", folder.display());
     println!("Output File: {}", output.display());
     println!();
 
     let mut hashes = Vec::new();
 
-    for entry in fs::read_dir(dir)? {
-        let thumbnail_path = entry?.path();
+    for file_path in fs::read_dir(folder)? {
+        let thumbnail_path = file_path?.path();
         if !thumbnail_path.is_file() {
             continue;
         }
@@ -66,7 +95,61 @@ fn main() -> anyhow::Result<()> {
     }
 
     hashes.sort_unstable_by(|a, b| a.filename.cmp(&b.filename));
-    std::fs::write(output, serde_json::to_string(&hashes).unwrap())?;
+    std::fs::write(&output, serde_json::to_string(&hashes).unwrap())?;
+
+    println!(
+        "Successfully wrote {} pHashes to {}",
+        hashes.len(),
+        output.display()
+    );
+
+    Ok(())
+}
+
+fn extract(screenshot: PathBuf, output: PathBuf) -> anyhow::Result<()> {
+    if !screenshot.is_file() {
+        bail!(
+            "Could not open character list screenshot {}",
+            screenshot.display()
+        );
+    }
+
+    if output.is_file() {
+        bail!("Output must point to a (new) directory");
+    }
+
+    println!("Screenshot: {}", screenshot.display());
+    println!("Output Directory: {}", output.display());
+    println!();
+
+    if !output.exists() {
+        print!("Creating output directory {}...", output.display());
+        std::fs::create_dir_all(&output)?;
+        println!(" done");
+    }
+
+    let img_character_list = ImageReader::open(&screenshot)?.decode()?;
+    let img_thumbnails = extract_thumbnail_images(&img_character_list);
+
+    if img_thumbnails.is_empty() {
+        println!("No card thumbnails found");
+    } else {
+        println!("Found {} card thumbnails", img_thumbnails.len());
+
+        let filename_base = screenshot.file_stem().unwrap();
+
+        for (i, img_thumbnail) in img_thumbnails.iter().enumerate() {
+            let mut filename = OsString::from(filename_base);
+            filename.push("-card-");
+            filename.push(i.to_string());
+            filename.push(".png");
+
+            let filepath = output.join(filename);
+            print!("Saving thumbnail {}...", filepath.display());
+            img_thumbnail.save(&filepath)?;
+            println!(" done");
+        }
+    }
 
     Ok(())
 }

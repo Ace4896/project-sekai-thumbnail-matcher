@@ -21,11 +21,15 @@ The CLI app can be used as follows:
 cd rust/cli
 
 # Generate hashes from <thumbnail-folder>
-# By default, the hashes are stored in "character_hashes.json"
-cargo run -- <thumbnail-folder>
+# By default, the hashes are stored in a file "character_hashes.json"
+# The output file can be changed using the --output flag
+cargo run -- hash <thumbnail-folder> --output "./character_hashes.json"
 
-# You can change the output filepath by specifying --output
-cargo run -- <thumbnail-folder> --output "character_hashes.json"
+# Extract thumbnail images from a character list screenshot
+# By default, any extracted thumbnails are stored in a folder called "output"
+# The output directory can be changed using the --output flag
+# The thumbnails are named after the original screenshot: <file>-card-n.png
+cargo run -- extract <file> --output "./output"
 ```
 
 The website demo is managed using NodeJS and Vite. First, run `npm install` to install dependencies, then use one of the scripts below:
