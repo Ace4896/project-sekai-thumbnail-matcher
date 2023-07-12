@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "npm run build:wasm && vite",
     "build": "npm run build:wasm-release && vite build",
-    "build:wasm": "wasm-pack build --target web ./rust/lib",
+    "build:wasm": "wasm-pack build --target web --debug ./rust/lib",
     "build:wasm-release": "wasm-pack build --target web --release ./rust/lib",
     "serve": "vite preview"
   },
