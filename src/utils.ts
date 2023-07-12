@@ -1,11 +1,19 @@
 import type { IRgba8ImageData } from "../rust/lib/pkg/pjsekai_thumbnail_matcher";
 
-/// Converts a Rust image to JS ImageData.
+/**
+ * Converts a Rust image to JS ImageData.
+ * @param {IRgba8ImageData} rustImage
+ * @returns {ImageData}
+ */
 export function convertRustImage(rustImage: IRgba8ImageData): ImageData {
   return new ImageData(new Uint8ClampedArray(rustImage.data), rustImage.width, rustImage.height);
 }
 
-/// Loads ImageData from a file using an offscreen canvas.
+/**
+ * Loads ImageData from a file using an offscreen canvas.
+ * @param file
+ * @returns 
+ */
 export function loadImageData(file: File): Promise<ImageData> {
   return new Promise((resolve) => {
     const img = document.createElement("img");
