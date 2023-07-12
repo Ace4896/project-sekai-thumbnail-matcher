@@ -1,4 +1,4 @@
-import { Component, For, Signal, createSignal } from "solid-js";
+import { Component, For, Show, Signal, createSignal, onMount } from "solid-js";
 
 import CanvasHost from "./CanvasHost";
 
@@ -6,11 +6,24 @@ import init, {
   extractThumbnailImages,
   generateThumbnailPhash,
 } from "../rust/lib/pkg/pjsekai_thumbnail_matcher";
-import { convertRustImage, loadImageData } from "./utils";
+
+import {
+  ThumbnailHash,
+  convertRustImage,
+  loadImageData,
+  loadThumbnailHashes,
+} from "./utils";
 
 const App: Component = () => {
+  let thumbnailHashes: ThumbnailHash[] = [];
+  const [ready, setReady] = createSignal(false);
   const [thumbnailImages, setThumbnailImages]: Signal<ImageData[]> =
     createSignal([]);
+
+  onMount(async () => {
+    thumbnailHashes = await loadThumbnailHashes();
+    setReady(true);
+  });
 
   const onFileInput = async (file: File) => {
     await init();
@@ -45,23 +58,25 @@ const App: Component = () => {
         </div>
       </nav>
 
-      <div class="container-md">
-        <div class="mb-4">
-          <label for="inputImgSource" class="form-label">
-            Load screenshot of character list...
-          </label>
-          <input
-            id="inputImgSource"
-            class="form-control"
-            type="file"
-            onchange={(e) => onFileInput(e.target.files[0])}
-          />
-        </div>
+      <Show when={ready()} fallback={<p>Loading...</p>}>
+        <div class="container-md">
+          <div class="mb-4">
+            <label for="inputImgSource" class="form-label">
+              Load screenshot of character list...
+            </label>
+            <input
+              id="inputImgSource"
+              class="form-control"
+              type="file"
+              onchange={(e) => onFileInput(e.target.files[0])}
+            />
+          </div>
 
-        <For each={thumbnailImages()}>
-          {(thumbnailImage) => <CanvasHost imageData={thumbnailImage} />}
-        </For>
-      </div>
+          <For each={thumbnailImages()}>
+            {(thumbnailImage) => <CanvasHost imageData={thumbnailImage} />}
+          </For>
+        </div>
+      </Show>
     </>
   );
 };
