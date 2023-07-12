@@ -2,35 +2,28 @@ import { Component, For, Signal, createSignal } from "solid-js";
 
 import CanvasHost from "./CanvasHost";
 
-import init, { generate_thumbnail_phash } from '../rust/lib/pkg/pjsekai_thumbnail_matcher.js';
-
-function loadImageData(file: File): Promise<ImageData> {
-  return new Promise(resolve => {
-    const img = document.createElement("img");
-
-    img.onload = () => {
-      const canvas = new OffscreenCanvas(img.width, img.height);
-      const ctx = canvas.getContext("2d");
-      ctx.drawImage(img, 0, 0);
-
-      const imageData = ctx.getImageData(0, 0, img.width, img.height);
-
-      init().then(() => {
-        console.log(imageData);
-        console.log(generate_thumbnail_phash(imageData));
-      })
-
-      resolve(imageData);
-    }
-
-    img.src = URL.createObjectURL(file);
-  });
-}
+import init, {
+  extract_thumbnail_images,
+  generate_thumbnail_phash,
+} from "../rust/lib/pkg/pjsekai_thumbnail_matcher";
+import { loadImageData } from "./utils";
 
 const App: Component = () => {
-  const [imageSource, setImageSource]: Signal<string> = createSignal();
   const [thumbnailImages, setThumbnailImages]: Signal<ImageData[]> =
     createSignal([]);
+
+  const onFileInput = async (file: File) => {
+    await init();
+
+    const imgCharacterList = await loadImageData(file);
+    const imgExtractedThumbnails = extract_thumbnail_images(
+      imgCharacterList
+    ).map(
+      (i) => new ImageData(new Uint8ClampedArray(i.data), i.width, i.height)
+    );
+
+    setThumbnailImages(imgExtractedThumbnails);
+  };
 
   return (
     <>
@@ -64,9 +57,13 @@ const App: Component = () => {
             id="inputImgSource"
             class="form-control"
             type="file"
-            onchange={(e) => loadImageData(e.target.files[0])}
+            onchange={(e) => onFileInput(e.target.files[0])}
           />
         </div>
+
+        <For each={thumbnailImages()}>
+          {(thumbnailImage) => <CanvasHost imageData={thumbnailImage} />}
+        </For>
       </div>
     </>
   );
