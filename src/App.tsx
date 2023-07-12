@@ -9,18 +9,20 @@ import init, {
 
 import {
   ThumbnailHash,
+  ThumbnailMatches,
   convertRustImage,
   findTopNThumbnails,
   loadImageData,
   loadThumbnailHashes,
 } from "./utils";
+import ThumbnailMatchTable from "./ThumbnailMatchTable";
 
 const App: Component = () => {
   let thumbnailHashes: ThumbnailHash[] = [];
 
   const maxMatches = 5;
   const [ready, setReady] = createSignal(false);
-  const [thumbnailImages, setThumbnailImages]: Signal<ImageData[]> =
+  const [thumbnailMatches, setThumbnailMatches]: Signal<ThumbnailMatches[]> =
     createSignal([]);
 
   onMount(async () => {
@@ -32,13 +34,21 @@ const App: Component = () => {
     await init();
 
     const imgCharacterList = await loadImageData(file);
-    const imgExtractedThumbnails =
-      extractThumbnailImages(imgCharacterList).map(convertRustImage);
+    const matches = extractThumbnailImages(imgCharacterList).map((rustImg) => {
+      const imgThumbnail = convertRustImage(rustImg);
+      const results = findTopNThumbnails(
+        imgThumbnail,
+        thumbnailHashes,
+        maxMatches
+      );
 
-    setThumbnailImages(imgExtractedThumbnails);
+      return {
+        source: imgThumbnail,
+        matches: results,
+      };
+    });
 
-    const thumbnailMatches = findTopNThumbnails(imgExtractedThumbnails[0], thumbnailHashes, maxMatches);
-    console.log(thumbnailMatches);
+    setThumbnailMatches(matches);
   };
 
   return (
@@ -78,9 +88,7 @@ const App: Component = () => {
             />
           </div>
 
-          <For each={thumbnailImages()}>
-            {(thumbnailImage) => <CanvasHost imageData={thumbnailImage} />}
-          </For>
+          <ThumbnailMatchTable thumbnailMatches={thumbnailMatches()} />
         </div>
       </Show>
     </>

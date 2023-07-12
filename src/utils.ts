@@ -1,4 +1,7 @@
-import { generateThumbnailPhash, type IRgba8ImageData } from "../rust/lib/pkg/pjsekai_thumbnail_matcher";
+import {
+  generateThumbnailPhash,
+  type IRgba8ImageData,
+} from "../rust/lib/pkg/pjsekai_thumbnail_matcher";
 
 const PHASH_LENGTH = 64;
 
@@ -6,15 +9,23 @@ const PHASH_LENGTH = 64;
  * Represents a parsed thumbnail hash.
  */
 export interface ThumbnailHash {
-  filename: String;
+  filename: string;
   phash: bigint;
 }
 
 /**
- * Represents a match to a reference thumbnail.
+ * Represents the matched thumbnails for a thumbnail image.
+ */
+export interface ThumbnailMatches {
+  source: ImageData;
+  matches: ThumbnailMatch[];
+}
+
+/**
+ * Represents the matched details for a thumbnail image.
  */
 export interface ThumbnailMatch {
-  filename: String;
+  filename: string;
   confidence: number;
 }
 
@@ -29,6 +40,15 @@ export function convertRustImage(rustImage: IRgba8ImageData): ImageData {
     rustImage.width,
     rustImage.height
   );
+}
+
+/**
+ * Gets the full path to a reference thumbnail.
+ * @param {string} filename
+ * @returns {string}
+ */
+export function getReferenceThumbnailPath(filename: string): string {
+  return `/thumbnails/${filename}`;
 }
 
 /**
@@ -91,7 +111,7 @@ export function findTopNThumbnails(
 
     return {
       filename: refHash.filename,
-      confidence: 1 - (distance / PHASH_LENGTH),
+      confidence: 1 - distance / PHASH_LENGTH,
     };
   });
 
