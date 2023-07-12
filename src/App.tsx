@@ -10,12 +10,15 @@ import init, {
 import {
   ThumbnailHash,
   convertRustImage,
+  findTopNThumbnails,
   loadImageData,
   loadThumbnailHashes,
 } from "./utils";
 
 const App: Component = () => {
   let thumbnailHashes: ThumbnailHash[] = [];
+
+  const maxMatches = 5;
   const [ready, setReady] = createSignal(false);
   const [thumbnailImages, setThumbnailImages]: Signal<ImageData[]> =
     createSignal([]);
@@ -33,6 +36,9 @@ const App: Component = () => {
       extractThumbnailImages(imgCharacterList).map(convertRustImage);
 
     setThumbnailImages(imgExtractedThumbnails);
+
+    const thumbnailMatches = findTopNThumbnails(imgExtractedThumbnails[0], thumbnailHashes, maxMatches);
+    console.log(thumbnailMatches);
   };
 
   return (
