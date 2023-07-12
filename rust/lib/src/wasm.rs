@@ -5,10 +5,19 @@ use web_sys::ImageData;
 
 use crate::{extractor, hasher};
 
+#[wasm_bindgen(typescript_custom_section)]
+const IRGBA8_IMAGE_DATA: &'static str = r#"
+interface IRgba8ImageData {
+  data: number[];
+  width: number;
+  height: number;
+}
+"#;
+
 #[wasm_bindgen]
 extern "C" {
-    #[wasm_bindgen(typescript_type = "Rgba8ImageData[]")]
-    pub type Rgba8ImageDataArray;
+    #[wasm_bindgen(typescript_type = "IRgba8ImageData[]")]
+    pub type IRgba8ImageDataArray;
 }
 
 /// A thin wrapper around RGBA8 image data.
@@ -16,29 +25,10 @@ extern "C" {
 /// JS's ImageData constructor doesn't copy the data into it's own buffer, so data corruption occurs.
 /// See: https://github.com/rustwasm/wasm-bindgen/issues/2445
 #[derive(Serialize)]
-#[wasm_bindgen]
 struct Rgba8ImageData {
     data: Vec<u8>,
     width: u32,
     height: u32,
-}
-
-#[wasm_bindgen]
-impl Rgba8ImageData {
-    #[wasm_bindgen(getter)]
-    pub fn data(&self) -> Vec<u8> {
-        self.data.clone()
-    }
-
-    #[wasm_bindgen(getter)]
-    pub fn width(&self) -> u32 {
-        self.width
-    }
-
-    #[wasm_bindgen(getter)]
-    pub fn height(&self) -> u32 {
-        self.height
-    }
 }
 
 impl From<&DynamicImage> for Rgba8ImageData {
@@ -62,7 +52,7 @@ fn convert_to_dynamic_image(image_data: ImageData) -> DynamicImage {
 
 /// Extracts card thumbnails from a character list screenshot.
 #[wasm_bindgen]
-pub fn extract_thumbnail_images(image_data: ImageData) -> Rgba8ImageDataArray {
+pub fn extract_thumbnail_images(image_data: ImageData) -> IRgba8ImageDataArray {
     let image = convert_to_dynamic_image(image_data);
     let thumbnail_images = extractor::extract_thumbnail_images(&image)
         .iter()

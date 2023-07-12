@@ -6,7 +6,7 @@ import init, {
   extract_thumbnail_images,
   generate_thumbnail_phash,
 } from "../rust/lib/pkg/pjsekai_thumbnail_matcher";
-import { loadImageData } from "./utils";
+import { convertRustImage, loadImageData } from "./utils";
 
 const App: Component = () => {
   const [thumbnailImages, setThumbnailImages]: Signal<ImageData[]> =
@@ -16,11 +16,8 @@ const App: Component = () => {
     await init();
 
     const imgCharacterList = await loadImageData(file);
-    const imgExtractedThumbnails = extract_thumbnail_images(
-      imgCharacterList
-    ).map(
-      (i) => new ImageData(new Uint8ClampedArray(i.data), i.width, i.height)
-    );
+    const imgExtractedThumbnails =
+      extract_thumbnail_images(imgCharacterList).map(convertRustImage);
 
     setThumbnailImages(imgExtractedThumbnails);
   };
