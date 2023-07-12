@@ -1,5 +1,7 @@
 # Default CLI Output
 **/character_hashes.json
+!public/character_hashes.json
+
 **/output
 
 # Rust
