@@ -22,7 +22,8 @@ extern "C" {
 
 /// A thin wrapper around RGBA8 image data.
 ///
-/// JS's ImageData constructor doesn't copy the data into it's own buffer, so data corruption occurs.
+/// When using the ImageData constructor from web_sys, the data isn't copied over, so data corruption can occur.
+///
 /// See: https://github.com/rustwasm/wasm-bindgen/issues/2445
 #[derive(Serialize)]
 struct Rgba8ImageData {
