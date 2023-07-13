@@ -1,7 +1,9 @@
-use image::{imageops, DynamicImage, GenericImageView, GrayImage};
+use image::{imageops, DynamicImage, GenericImageView, GrayImage, Luma};
 use imageproc::{contours::BorderType, rect::Rect};
 
 use crate::utils::{median, BoundingRect};
+
+const COLOUR_WHITE: Luma<u8> = Luma([255]);
 
 /// Extracts card thumbnails from a character list screenshot.
 pub fn extract_thumbnail_images(img_list: &DynamicImage) -> Vec<DynamicImage> {
@@ -55,7 +57,7 @@ fn extract_character_thumbnails(
             box_rect.height(),
         )
         .to_image();
-    
+
     imageproc::contrast::threshold_mut(&mut img_box_thresh, 250);
     imageops::invert(&mut img_box_thresh);
 
@@ -74,7 +76,7 @@ fn extract_character_thumbnails(
             imageproc::drawing::draw_filled_rect_mut(
                 &mut img_box_thresh,
                 Rect::at(rect.left as i32, rect.top as i32).of_size(rect.width(), rect.height()),
-                [255].into(),
+                COLOUR_WHITE,
             )
         }
     }
