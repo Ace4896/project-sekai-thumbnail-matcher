@@ -1,10 +1,7 @@
-import { Component, For, Show, Signal, createSignal, onMount } from "solid-js";
-
-import CanvasHost from "./CanvasHost";
+import { Component, Show, Signal, createSignal, onMount } from "solid-js";
 
 import init, {
   extractThumbnailImages,
-  generateThumbnailPhash,
 } from "../rust/lib/pkg/pjsekai_thumbnail_matcher";
 
 import {
@@ -15,6 +12,7 @@ import {
   loadImageData,
   loadThumbnailHashes,
 } from "./utils";
+
 import ThumbnailMatchTable from "./ThumbnailMatchTable";
 
 const App: Component = () => {
