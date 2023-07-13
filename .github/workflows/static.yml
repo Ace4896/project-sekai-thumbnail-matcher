@@ -6,6 +6,7 @@ on:
   push:
     branches: ["master"]
     paths:
+      - '.github/workflows/static.yml'
       - 'index.html'
       - 'package-*.json'
       - 'tsconfig.json'
