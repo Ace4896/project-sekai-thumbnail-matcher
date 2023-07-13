@@ -44,7 +44,7 @@ jobs:
           node-version: 18
           cache: 'npm'
       - name: Set up Rust toolchain
-        uses: actions-rs/toochain@v1
+        uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
       - name: Install dependencies
