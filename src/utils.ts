@@ -98,23 +98,29 @@ export function findTopNThumbnails(
 ): ThumbnailMatch[] {
   const inputHash = generateThumbnailPhash(imgThumbnail);
 
-  const matches: ThumbnailMatch[] = referenceHashes.map((refHash) => {
-    // Determine match confidence using hamming distance
-    const xor = (inputHash ^ refHash.phash).toString(2);
-    let distance = 0;
-
-    for (let i = 0; i < xor.length; i++) {
-      if (xor[i] === "1") {
-        distance++;
-      }
-    }
-
-    return {
-      filename: refHash.filename,
-      confidence: 1 - distance / PHASH_LENGTH,
-    };
-  });
+  const matches: ThumbnailMatch[] = referenceHashes.map((refHash) => ({
+    filename: refHash.filename,
+    confidence: 1 - hammingDistance(inputHash, refHash.phash) / PHASH_LENGTH,
+  }));
 
   matches.sort((a, b) => b.confidence - a.confidence);
   return matches.slice(0, n);
+}
+
+/**
+ * Finds the hamming distance between two BigIntegers.
+ * @param {bigint} a
+ * @param {bigint} b
+ * @returns {number}
+ */
+function hammingDistance(a: bigint, b: bigint): number {
+  let xor = a ^ b;
+  let distance = 0;
+
+  while (xor > 0) {
+    xor &= xor - 1n;
+    distance++;
+  }
+
+  return distance;
 }
