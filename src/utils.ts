@@ -78,7 +78,9 @@ export function loadImageData(file: File): Promise<ImageData> {
  * @returns {Promise<ThumbnailHash[]>}
  */
 export async function loadThumbnailHashes(): Promise<ThumbnailHash[]> {
-  const response = await fetch("/character_hashes.json");
+  const response = await fetch(
+    new URL("/character_hashes.json", import.meta.url)
+  );
 
   return JSON.parse(await response.text(), (key, value) =>
     key === "phash" ? BigInt(value) : value
