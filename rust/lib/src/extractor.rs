@@ -45,7 +45,9 @@ fn extract_character_thumbnails(
     img_list_gray: &GrayImage,
     box_rect: &BoundingRect,
 ) -> Vec<DynamicImage> {
-    let img_box_gray = img_list_gray
+    // Find outer contours within the character box
+    // This time, we want near-black pixels to form the contours, so use an inverse threshold
+    let mut img_box_thresh = img_list_gray
         .view(
             box_rect.left,
             box_rect.top,
@@ -53,16 +55,14 @@ fn extract_character_thumbnails(
             box_rect.height(),
         )
         .to_image();
-
-    // Find outer contours within the character box
-    // This time, we want near-black pixels to form the contours, so use an inverse threshold
-    let mut img_box_thresh = imageproc::contrast::threshold(&img_box_gray, 250);
+    
+    imageproc::contrast::threshold_mut(&mut img_box_thresh, 250);
     imageops::invert(&mut img_box_thresh);
 
     let initial_contours = imageproc::contours::find_contours::<u32>(&img_box_thresh);
 
     // These contours may be disjointed, so draw a new binary image from the outer contours and find contours again
-    img_box_thresh = GrayImage::new(img_box_gray.width(), img_box_gray.height());
+    img_box_thresh = GrayImage::new(box_rect.width(), box_rect.height());
 
     for outer_contour in initial_contours
         .iter()
