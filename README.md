@@ -4,6 +4,18 @@ A test app for extracting and matching Project Sekai card thumbnails.
 
 ## Usage
 
+[Link to Website Demo](https://ace4896.github.io/project-sekai-thumbnail-matcher/)
+
+Upload a full, uncropped screenshot of your character list, e.g.:
+
+![Character List](./docs/character-list.jpg)
+
+If any card thumbnails can be located, the table will update to show potential matches for each one:
+
+![Matched Thumbnails](./docs/matched-thumbnails.jpg)
+
+## Developer Usage
+
 There are three projects in this repository:
 
 - [`rust/lib`](./rust/lib): A Rust library for extracting and hashing thumbnail images
@@ -49,3 +61,5 @@ npm run serve
 npm run build:wasm          # Debug build
 npm run build:wasm-release  # Release build
 ```
+
+The client-side code will use the pre-computed pHashes from [`public/character_hashes.json`](./public/character_hashes.json) to match the extracted thumbnails to those in [`public/thumbnails`](./public/thumbnails/).
