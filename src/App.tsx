@@ -74,8 +74,8 @@ const App: Component = () => {
         </div>
       </nav>
 
-      <Show when={ready()} fallback={<p>Loading...</p>}>
-        <div class="container-md">
+      <div class="container-md">
+        <Show when={ready()} fallback={<p>Loading...</p>}>
           <div class="mb-4">
             <label for="inputImgSource" class="form-label">
               Load screenshot of character list...
@@ -89,8 +89,8 @@ const App: Component = () => {
           </div>
 
           <ThumbnailMatchTable thumbnailMatches={thumbnailMatches()} />
-        </div>
-      </Show>
+        </Show>
+      </div>
     </>
   );
 };
