@@ -2,6 +2,11 @@
 
 A test app for extracting and matching Project Sekai card thumbnails.
 
+This is a showcase of the approaches I found in [this repository](https://github.com/Ace4896/project-sekai-thumbnail-matching-notes):
+
+- Using image contours to extract character thumbnails
+- Using pHashes to identify and search for images
+
 ## Usage
 
 [Link to Website Demo](https://ace4896.github.io/project-sekai-thumbnail-matcher/)
