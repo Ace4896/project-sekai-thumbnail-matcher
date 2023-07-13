@@ -48,7 +48,10 @@ export function convertRustImage(rustImage: IRgba8ImageData): ImageData {
  * @returns {string}
  */
 export function getReferenceThumbnailPath(filename: string): string {
-  return `/thumbnails/${filename}`;
+  // NOTE: Vite doesn't seem to transform this correctly
+  // return new URL(`/thumbnails/${filename}`, import.meta.url);
+
+  return `${import.meta.env.BASE_URL}thumbnails/${filename}`;
 }
 
 /**
