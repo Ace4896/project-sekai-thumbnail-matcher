@@ -96,24 +96,21 @@ fn extract_character_thumbnails(
 
     final_contours.retain(|rect| rect.width() as f64 > width_threshold && rect.is_square_like());
 
-    // TODO: There's a lot of casting here, probably can be improved
     // Finally, crop the thumbnail images from the original image
-    let img_box = img_list
-        .view(
-            box_rect.left,
-            box_rect.top,
-            box_rect.width(),
-            box_rect.height(),
-        )
-        .to_image();
+    let img_box = img_list.view(
+        box_rect.left,
+        box_rect.top,
+        box_rect.width(),
+        box_rect.height(),
+    );
 
     final_contours
         .iter()
         .map(|rect| {
-            DynamicImage::ImageRgba8(
-                imageops::crop_imm(&img_box, rect.left, rect.top, rect.width(), rect.height())
-                    .to_image(),
-            )
+            img_box
+                .view(rect.left, rect.top, rect.width(), rect.height())
+                .to_image()
+                .into()
         })
         .collect::<Vec<_>>()
 }
