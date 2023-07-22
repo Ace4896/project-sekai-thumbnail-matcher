@@ -13,9 +13,9 @@
   },
   "license": "MIT",
   "devDependencies": {
-    "sass": "^1.63.6",
+    "sass": "^1.64.1",
     "typescript": "^5.1.6",
-    "vite": "^4.4.4",
+    "vite": "^4.4.6",
     "vite-plugin-solid": "^2.7.0",
     "wasm-pack": "^0.12.1"
   },
