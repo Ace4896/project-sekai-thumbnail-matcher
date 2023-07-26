@@ -10,6 +10,8 @@ crate-type = ["cdylib", "rlib"]
 [dependencies]
 image = { version = "0.24", default-features = false }
 imageproc = "0.23"
+ndarray = "0.15"
+ndrustfft = "0.4"
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 serde = { version = "1.0", features = ["derive"] }

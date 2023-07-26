@@ -1,4 +1,6 @@
 use image::{imageops::FilterType, DynamicImage};
+use ndarray::{s, Array2, ArrayView2};
+use ndrustfft::DctHandler;
 
 const HASH_IMAGE_SIZE: usize = 32;
 const REDUCED_DCT2_SIZE: usize = 8;
@@ -20,59 +22,36 @@ pub fn generate_thumbnail_phash(img_thumbnail: &DynamicImage) -> u64 {
 
     // Convert to grayscale - f32 is needed for DCT-II
     let img_gray = img_resized.to_luma32f();
-    let raw_gray = img_gray.as_raw();
+    let raw_gray =
+        ArrayView2::from_shape((HASH_IMAGE_SIZE, HASH_IMAGE_SIZE), img_gray.as_raw()).unwrap();
 
     // Perform DCT-II on the image
     // The first value is set to 0.0 to exclude completely flat image information
-    // TODO: This can definitely be optimised, just need something that works first
-    let mut raw_dct2 = vec![0.0; HASH_IMAGE_SIZE * HASH_IMAGE_SIZE];
-    let pi_over_n = std::f32::consts::PI / HASH_IMAGE_SIZE as f32;
+    let mut raw_dct2: Array2<f32> = Array2::zeros(raw_gray.raw_dim());
 
-    for k1 in 0..HASH_IMAGE_SIZE {
-        for k2 in 0..HASH_IMAGE_SIZE {
-            let mut sum: f32 = 0.0;
+    {
+        let mut tmp: Array2<f32> = Array2::zeros(raw_gray.raw_dim());
+        let mut dct2_handler_ax0 = DctHandler::<f32>::new(HASH_IMAGE_SIZE);
+        let mut dct2_handler_ax1 = DctHandler::<f32>::new(HASH_IMAGE_SIZE);
 
-            for n1 in 0..HASH_IMAGE_SIZE {
-                let mut n2_sum: f32 = 0.0;
-
-                for n2 in 0..HASH_IMAGE_SIZE {
-                    n2_sum += raw_gray[n1 * HASH_IMAGE_SIZE + n2]
-                        * (pi_over_n * (n2 as f32 + 0.5) * k2 as f32).cos();
-                }
-
-                sum += n2_sum * (pi_over_n * (n1 as f32 + 0.5) * k1 as f32).cos();
-            }
-
-            raw_dct2[k1 * HASH_IMAGE_SIZE + k2] = sum;
-        }
+        ndrustfft::nddct2(&raw_gray, &mut tmp, &mut dct2_handler_ax1, 1);
+        ndrustfft::nddct2(&tmp, &mut raw_dct2, &mut dct2_handler_ax0, 0);
     }
 
-    raw_dct2[0] = 0.0;
+    raw_dct2[[0, 0]] = 0.0;
 
     // Determine the average DCT-II value for the top-left 8x8
-    let mut average: f32 = 0.0;
-
-    for x in 0..REDUCED_DCT2_SIZE {
-        for y in 0..REDUCED_DCT2_SIZE {
-            average += raw_dct2[x * HASH_IMAGE_SIZE + y];
-        }
-    }
-
-    average /= HASH_LENGTH as f32;
+    let reduced_dct2 = raw_dct2.slice(s![0..REDUCED_DCT2_SIZE, 0..REDUCED_DCT2_SIZE]);
+    let average = reduced_dct2.mean().unwrap();
 
     // Construct the hash from the top-left 8x8
     // If the DCT-II value is above the average, then set it's bit in the hash to 1
-    let mut hash: u64 = 0;
-
-    for x in 0..REDUCED_DCT2_SIZE {
-        for y in 0..REDUCED_DCT2_SIZE {
-            if raw_dct2[x * HASH_IMAGE_SIZE + y] > average {
-                hash |= 1 << (HASH_LENGTH - 1 - (x * REDUCED_DCT2_SIZE + y));
-            }
-        }
-    }
-
-    hash
+    reduced_dct2
+        .indexed_iter()
+        .filter(|(_, &dct2_val)| dct2_val > average)
+        .fold(0u64, |hash, ((y, x), _)| {
+            hash | (1 << (HASH_LENGTH - 1 - (x * REDUCED_DCT2_SIZE + y)))
+        })
 }
 
 /// Crops a thumbnail to a region that isn't affected by UI elements. This removes:
