@@ -34,8 +34,8 @@ pub fn generate_thumbnail_phash(img_thumbnail: &DynamicImage) -> u64 {
         let mut dct2_handler_ax0 = DctHandler::<f32>::new(HASH_IMAGE_SIZE);
         let mut dct2_handler_ax1 = DctHandler::<f32>::new(HASH_IMAGE_SIZE);
 
-        ndrustfft::nddct2(&raw_gray, &mut tmp, &mut dct2_handler_ax1, 1);
-        ndrustfft::nddct2(&tmp, &mut raw_dct2, &mut dct2_handler_ax0, 0);
+        ndrustfft::nddct2_par(&raw_gray, &mut tmp, &mut dct2_handler_ax1, 1);
+        ndrustfft::nddct2_par(&tmp, &mut raw_dct2, &mut dct2_handler_ax0, 0);
     }
 
     raw_dct2[[0, 0]] = 0.0;
