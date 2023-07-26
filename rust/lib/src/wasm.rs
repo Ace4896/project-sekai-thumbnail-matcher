@@ -32,12 +32,14 @@ struct Rgba8ImageData {
     height: u32,
 }
 
-impl From<&DynamicImage> for Rgba8ImageData {
-    fn from(value: &DynamicImage) -> Self {
+impl From<DynamicImage> for Rgba8ImageData {
+    fn from(value: DynamicImage) -> Self {
+        let (width, height) = (value.width(), value.height());
+
         Self {
-            data: value.to_rgba8().as_raw().clone(),
-            width: value.width(),
-            height: value.height(),
+            data: value.to_rgba8().into_raw(),
+            width,
+            height,
         }
     }
 }
@@ -56,7 +58,7 @@ fn convert_to_dynamic_image(image_data: ImageData) -> DynamicImage {
 pub fn extract_thumbnail_images(image_data: ImageData) -> IRgba8ImageDataArray {
     let image = convert_to_dynamic_image(image_data);
     let thumbnail_images = extractor::extract_thumbnail_images(&image)
-        .iter()
+        .into_iter()
         .map(Rgba8ImageData::from)
         .collect::<Vec<_>>();
 
