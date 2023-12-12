@@ -1,20 +1,25 @@
 [package]
 name = "pjsekai_thumbnail_matcher"
-version = "0.1.0"
-edition = "2021"
+description = "Library for matching Project Sekai card thumbnails."
+version.workspace = true
+authors.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
 publish = false
 
 [lib]
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-image = { version = "0.24", default-features = false }
-imageproc = "0.23"
-ndarray = "0.15"
-ndrustfft = "0.4"
+image.workspace = true
+imageproc.workspace = true
+ndarray.workspace = true
+ndrustfft.workspace = true
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
-serde = { version = "1.0", features = ["derive"] }
-serde-wasm-bindgen = "0.6"
-wasm-bindgen = "0.2"
-web-sys = { version = "0.3", features = ["ImageData"] }
+serde.workspace = true
+serde-wasm-bindgen.workspace = true
+wasm-bindgen.workspace = true
+web-sys.workspace = true

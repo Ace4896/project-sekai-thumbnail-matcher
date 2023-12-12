@@ -1,3 +1,27 @@
 [workspace]
 members = ["cli", "lib"]
 resolver = "2"
+
+[workspace.package]
+version = "0.1.0"
+authors = ["Jon Pacheco <jon.pacheco2@gmail.com>"]
+edition = "2021"
+license = "MIT"
+repository = "https://github.com/Ace4896/project-sekai-thumbnail-matcher"
+homepage = "https://github.com/Ace4896/project-sekai-thumbnail-matcher"
+
+[workspace.dependencies]
+pjsekai_thumbnail_matcher = { version = "0.1.0", path = "lib" }
+pjsekai_thumbnail_matcher_cli = { version = "0.1.0", path = "cli" }
+
+anyhow = "1.0"
+clap = { version = "4.4", features = ["derive"] }
+image = "0.24"
+imageproc = "0.23"
+ndarray = "0.15"
+ndrustfft = "0.4"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+serde-wasm-bindgen = "0.6"
+wasm-bindgen = "0.2"
+web-sys = { version = "0.3", features = ["ImageData"] }
