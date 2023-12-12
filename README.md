@@ -29,7 +29,7 @@ There are three projects in this repository:
 
 To build the app, make sure you have:
 
-- Stable Rust (tested on 1.70)
+- Stable Rust (tested on 1.74)
 - NodeJS LTS (tested on 18.16.0)
 
 The CLI app can be used as follows:
