@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "description": "A test app for extracting and matching Project Sekai card thumbnails.",
   "private": true,
+  "type": "module",
   "main": "src/index.tsx",
   "scripts": {
     "dev": "npm run build:wasm && vite",
