@@ -31,6 +31,7 @@ To build the app, make sure you have:
 
 - Stable Rust (tested on 1.74)
 - NodeJS LTS (tested on 18.16.0)
+- [`wasm-pack`](https://rustwasm.github.io/wasm-pack/installer/)
 
 The CLI app can be used as follows:
 

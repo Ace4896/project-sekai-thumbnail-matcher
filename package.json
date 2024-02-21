@@ -16,8 +16,7 @@
     "sass": "^1.71.1",
     "typescript": "^5.3.3",
     "vite": "^5.1.4",
-    "vite-plugin-solid": "^2.10.1",
-    "wasm-pack": "^0.12.1"
+    "vite-plugin-solid": "^2.10.1"
   },
   "dependencies": {
     "@popperjs/core": "^2.11.8",
