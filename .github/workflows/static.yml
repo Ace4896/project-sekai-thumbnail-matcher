@@ -45,7 +45,7 @@ jobs:
           node-version: 20
           cache: 'npm'
       - name: Set up Rust toolchain
-        uses: dtolnay/rust-toolchain@1.75.0
+        uses: dtolnay/rust-toolchain@1.79.0
       - name: Set up wasm-pack
         run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
       - name: Install dependencies
