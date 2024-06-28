@@ -1,5 +1,5 @@
-use image::{imageops, DynamicImage, GenericImageView, GrayImage, Luma};
-use imageproc::{contours::BorderType, rect::Rect};
+use image::{DynamicImage, GenericImageView, GrayImage, Luma};
+use imageproc::{contours::BorderType, contrast::ThresholdType, rect::Rect};
 
 use crate::utils::{median, BoundingRect};
 
@@ -16,7 +16,8 @@ pub fn extract_thumbnail_images(img_list: &DynamicImage) -> Vec<DynamicImage> {
 
 fn extract_character_box(img_character_list_gray: &GrayImage) -> Option<BoundingRect> {
     // Threshold the grayscale image to retain near-white pixels
-    let img_thresh = imageproc::contrast::threshold(&img_character_list_gray, 250);
+    let img_thresh =
+        imageproc::contrast::threshold(&img_character_list_gray, 250, ThresholdType::Binary);
 
     // Find the largest outer contour - this should be the character box
     let contours = imageproc::contours::find_contours::<u32>(&img_thresh);
@@ -58,8 +59,7 @@ fn extract_character_thumbnails(
         )
         .to_image();
 
-    imageproc::contrast::threshold_mut(&mut img_box_thresh, 250);
-    imageops::invert(&mut img_box_thresh);
+    imageproc::contrast::threshold_mut(&mut img_box_thresh, 250, ThresholdType::BinaryInverted);
 
     let initial_contours = imageproc::contours::find_contours::<u32>(&img_box_thresh);
 
